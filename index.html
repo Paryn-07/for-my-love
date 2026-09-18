@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Our Timeline</title>
 
-    <!-- Load Tailwind CSS for responsive layouts -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Load Google Fonts for beautiful Thai typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -21,6 +19,10 @@
             --text-color: #ffffff;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Kanit', sans-serif;
             background-color: #000000;
@@ -30,7 +32,6 @@
             touch-action: none;
         }
 
-        /* Canvas for 3D graphics */
         #heartCanvas {
             position: absolute;
             top: 0;
@@ -41,7 +42,6 @@
             pointer-events: none;
         }
 
-        /* Overlay UI Container */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -52,11 +52,11 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            align-items: center;
             padding-bottom: 5vh;
             pointer-events: none;
         }
 
-        /* Glassmorphism Timer Container */
         .glass-panel {
             background: rgba(255, 10, 110, 0.05);
             border: 1px solid rgba(255, 102, 178, 0.2);
@@ -70,7 +70,6 @@
             animation: float 6s ease-in-out infinite;
         }
 
-        /* Individual Time Blocks */
         .time-block {
             display: flex;
             flex-direction: column;
@@ -108,17 +107,6 @@
             margin-top: 2px;
         }
 
-        /* Text Effects */
-        .glowing-text {
-            color: #ffffff;
-            text-shadow:
-                0 0 10px var(--primary-glow),
-                0 0 20px var(--primary-glow),
-                0 0 40px var(--secondary-glow);
-            letter-spacing: 1px;
-        }
-
-        /* Floating animation for the UI panel */
         @keyframes float {
             0% {
                 transform: translateY(0px);
@@ -133,7 +121,6 @@
             }
         }
 
-        /* Responsive Adjustments for Mobile / iPad */
         @media (min-width: 640px) {
             .time-block {
                 min-width: 90px;
@@ -175,48 +162,39 @@
 
 <body>
 
-    <!-- 3D Heart Canvas -->
     <canvas id="heartCanvas"></canvas>
 
-    <!-- UI Overlay for Text and Timer -->
     <div id="ui-layer" class="w-full h-full flex flex-col items-center">
 
-        <!-- Timer Container -->
         <div class="glass-panel w-[95%] sm:w-auto max-w-4xl mx-auto px-4 py-6 sm:px-8 sm:py-8 flex flex-col items-center">
 
             <div class="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 w-full">
 
-                <!-- Years -->
                 <div class="time-block">
                     <span id="val-years" class="time-value">0</span>
                     <span class="time-label">ปี</span>
                 </div>
 
-                <!-- Months -->
                 <div class="time-block">
                     <span id="val-months" class="time-value">0</span>
                     <span class="time-label">เดือน</span>
                 </div>
 
-                <!-- Days -->
                 <div class="time-block">
                     <span id="val-days" class="time-value">0</span>
                     <span class="time-label">วัน</span>
                 </div>
 
-                <!-- Hours -->
                 <div class="time-block">
                     <span id="val-hours" class="time-value">0</span>
                     <span class="time-label">ชั่วโมง</span>
                 </div>
 
-                <!-- Minutes -->
                 <div class="time-block">
                     <span id="val-mins" class="time-value">0</span>
                     <span class="time-label">นาที</span>
                 </div>
 
-                <!-- Seconds -->
                 <div class="time-block">
                     <span id="val-secs" class="time-value">0</span>
                     <span class="time-label">วินาที</span>
@@ -233,7 +211,7 @@
 
     <script>
         /* ========================================================
-           3D HEART CANVAS LOGIC
+           3D HEART
            ======================================================== */
 
         const canvas = document.getElementById('heartCanvas');
@@ -241,15 +219,14 @@
 
         let points = [];
 
-        // Rotation values
+        // หมุนแนวตั้งน้อยลง เพื่อให้เห็นทรงหัวใจชัด
+        let angleX = 0.08;
         let angleY = 0;
-        let angleX = 0.2;
 
-        // Used to make animation FPS-independent
         let lastTime = 0;
 
         /* ========================================================
-           CANVAS RESIZE
+           RESIZE
            ======================================================== */
 
         function resize() {
@@ -261,11 +238,6 @@
             canvas.style.width = window.innerWidth + 'px';
             canvas.style.height = window.innerHeight + 'px';
 
-            /*
-             * Reset transform first.
-             * Prevents ctx.scale() from stacking every time
-             * the browser resizes the canvas.
-             */
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(dpr, dpr);
         }
@@ -274,41 +246,52 @@
         resize();
 
         /* ========================================================
-           GENERATE 3D HEART
+           GENERATE HEART
            ======================================================== */
 
         function generateHeartCloud() {
+
             points = [];
 
             const textToRender = "เค้ารักคูมนะ";
 
-            // Number of particles
-            const numPoints = 500;
+            /*
+             * เพิ่มจำนวนจุดจาก 500 เป็น 900
+             * เพื่อให้ทรงหัวใจเห็นชัดขึ้น
+             */
+            const numPoints = 900;
 
             let attempts = 0;
 
-            while (points.length < numPoints && attempts < 100000) {
-
+            while (
+                points.length < numPoints &&
+                attempts < 150000
+            ) {
                 attempts++;
 
-                // Random coordinates
                 let x = (Math.random() - 0.5) * 3.5;
                 let y = (Math.random() - 0.5) * 3.5;
                 let z = (Math.random() - 0.5) * 3.5;
 
-                // 3D Heart Equation
-                let a = x * x + 2.25 * y * y + z * z - 1;
+                /*
+                 * 3D Heart Equation
+                 */
+                let a =
+                    x * x +
+                    2.25 * y * y +
+                    z * z -
+                    1;
 
                 let val =
-                    a * a * a
-                    - (x * x * z * z * z)
-                    - (0.1125 * y * y * z * z * z);
+                    a * a * a -
+                    (x * x * z * z * z) -
+                    (0.1125 * y * y * z * z * z);
 
                 /*
-                 * Keep points slightly inside the heart surface
-                 * to create the hollow 3D-shell appearance.
+                 * ทำ shell ให้หนาขึ้นเล็กน้อย
+                 * จะมองออกว่าเป็นรูปหัวใจมากขึ้น
                  */
-                if (val <= 0.0 && val > -0.2) {
+                if (val <= 0.0 && val > -0.28) {
 
                     points.push({
                         origX: x,
@@ -321,17 +304,13 @@
         }
 
         /* ========================================================
-           HEART ANIMATION
+           ANIMATION
            ======================================================== */
 
         function animateHeart(currentTime = 0) {
 
             requestAnimationFrame(animateHeart);
 
-            /*
-             * Calculate time difference between frames.
-             * This makes the rotation speed independent of FPS.
-             */
             const deltaTime = Math.min(
                 (currentTime - lastTime) / 1000,
                 0.05
@@ -339,7 +318,6 @@
 
             lastTime = currentTime;
 
-            // Clear canvas
             ctx.clearRect(
                 0,
                 0,
@@ -348,93 +326,79 @@
             );
 
             /*
-             * Smooth rotation.
-             *
-             * Old:
-             * angleY += 0.006;
-             *
-             * New:
-             * Uses actual elapsed time instead of frame count.
+             * หมุนช้าลงกว่าเดิม
+             * ทำให้ดู smooth และนุ่มกว่า
              */
-            angleY += 0.45 * deltaTime;
+            angleY += 0.32 * deltaTime;
 
             /* ====================================================
                POSITION
                ==================================================== */
 
-            // Horizontal center
-            let cx = window.innerWidth / 2;
+            const cx = window.innerWidth / 2;
 
             /*
-             * Heart center position.
-             *
-             * 0.38 = slightly above the center,
-             * leaving enough room for the timer below.
+             * วางหัวใจประมาณ 34% จากด้านบน
+             * เพื่อให้ timer ด้านล่างยังมีพื้นที่
              */
-            let cy = window.innerHeight * 0.38;
+            const cy = window.innerHeight * 0.34;
 
             /* ====================================================
                SIZE
                ==================================================== */
 
             /*
-             * Smaller than the previous 0.45.
-             *
-             * This prevents the heart from reaching
-             * too close to the edge of smaller screens.
+             * ใหญ่ขึ้นจากเวอร์ชันก่อน
+             * แต่ยังไม่ใหญ่เท่าเวอร์ชันแรก
              */
-            let baseSize =
+            const baseSize =
                 Math.min(
                     window.innerWidth,
                     window.innerHeight
-                ) * 0.30;
+                ) * 0.34;
 
             /* ====================================================
-               3D TRANSFORMATION
+               3D PROJECTION
                ==================================================== */
 
             let projected = points.map(p => {
 
-                /* ----------------------------------------------
-                   Rotate around X-axis
-                   ---------------------------------------------- */
+                /* Rotate X */
+
+                const cosX = Math.cos(angleX);
+                const sinX = Math.sin(angleX);
 
                 let y1 =
-                    p.origY * Math.cos(angleX)
-                    -
-                    p.origZ * Math.sin(angleX);
+                    p.origY * cosX -
+                    p.origZ * sinX;
 
                 let z1 =
-                    p.origY * Math.sin(angleX)
-                    +
-                    p.origZ * Math.cos(angleX);
+                    p.origY * sinX +
+                    p.origZ * cosX;
 
-                /* ----------------------------------------------
-                   Rotate around Y-axis
-                   ---------------------------------------------- */
+                /* Rotate Y */
+
+                const cosY = Math.cos(angleY);
+                const sinY = Math.sin(angleY);
 
                 let x2 =
-                    p.origX * Math.cos(angleY)
-                    -
-                    z1 * Math.sin(angleY);
+                    p.origX * cosY -
+                    z1 * sinY;
 
                 let z2 =
-                    p.origX * Math.sin(angleY)
-                    +
-                    z1 * Math.cos(angleY);
-
-                let y2 = y1;
+                    p.origX * sinY +
+                    z1 * cosY;
 
                 return {
                     x: x2,
-                    y: y2,
+                    y: y1,
                     z: z2,
                     text: p.text
                 };
             });
 
             /* ====================================================
-               PAINTER'S ALGORITHM
+               SORT DEPTH
                ==================================================== */
 
             projected.sort((a, b) => a.z - b.z);
@@ -443,100 +407,92 @@
             ctx.textBaseline = 'middle';
 
             /* ====================================================
-               DRAW PARTICLES
+               DRAW HEART
                ==================================================== */
 
             projected.forEach(p => {
 
-                /* ----------------------------------------------
-                   Perspective
-                   ---------------------------------------------- */
+                const fov = 3.0;
 
-                let fov = 3.0;
-
-                let perspectiveScale =
-                    fov / (fov + p.z);
+                const perspectiveScale =
+                    fov /
+                    (fov + p.z);
 
                 if (perspectiveScale < 0) {
                     return;
                 }
 
-                /* ----------------------------------------------
-                   Screen Position
-                   ---------------------------------------------- */
-
-                let screenX =
+                const screenX =
                     cx +
                     p.x *
                     baseSize *
                     perspectiveScale;
 
-                let screenY =
+                const screenY =
                     cy +
                     p.y *
                     baseSize *
                     perspectiveScale;
 
-                /* ----------------------------------------------
-                   Font Size
-                   ---------------------------------------------- */
-
-                let responsiveFontSize =
+                /*
+                 * ขนาดตัวอักษร
+                 */
+                const responsiveFontSize =
                     window.innerWidth < 768
-                        ? 9
-                        : 13;
+                        ? 10
+                        : 14;
 
-                let fontSize =
+                const fontSize =
                     responsiveFontSize *
                     perspectiveScale;
 
                 ctx.font =
                     `bold ${fontSize}px 'Kanit', sans-serif`;
 
-                /* ----------------------------------------------
-                   Depth Alpha
-                   ---------------------------------------------- */
-
-                let alpha =
+                /*
+                 * Depth
+                 */
+                const alpha =
                     Math.max(
-                        0.15,
+                        0.18,
                         Math.min(
                             1,
                             (p.z + 2) / 3
                         )
                     );
 
-                /* ----------------------------------------------
-                   Glow
-                   ---------------------------------------------- */
-
+                /*
+                 * Glow
+                 */
                 ctx.shadowBlur =
-                    8 * perspectiveScale;
+                    9 *
+                    perspectiveScale;
 
                 ctx.shadowColor =
                     `rgba(255, 102, 178, ${alpha})`;
 
-                /* ----------------------------------------------
-                   Pink Brightness
-                   ---------------------------------------------- */
-
-                let brightness =
+                /*
+                 * Pink brightness
+                 */
+                const brightness =
                     Math.floor(
-                        150 +
-                        (alpha * 105)
+                        155 +
+                        alpha * 100
+                    );
+
+                const green =
+                    Math.max(
+                        120,
+                        255 - brightness + 100
                     );
 
                 ctx.fillStyle =
                     `rgba(
                         255,
-                        ${255 - brightness + 100},
+                        ${green},
                         ${brightness},
                         ${alpha}
                     )`;
-
-                /* ----------------------------------------------
-                   Draw text
-                   ---------------------------------------------- */
 
                 ctx.fillText(
                     p.text,
@@ -547,26 +503,19 @@
         }
 
         /* ========================================================
-           INITIALIZE HEART
+           START HEART
            ======================================================== */
 
         generateHeartCloud();
         animateHeart();
 
+
         /* ========================================================
-           RELATIONSHIP TIMER LOGIC
+           RELATIONSHIP TIMER
            ======================================================== */
 
         function calculateRelationshipTime() {
 
-            /*
-             * Start Date:
-             * April 19, 2022, 00:00:00
-             *
-             * JavaScript month is 0-indexed:
-             * January = 0
-             * April = 3
-             */
             const startDate =
                 new Date(
                     2022,
@@ -579,80 +528,60 @@
 
             const now = new Date();
 
-            /* ----------------------------------------------------
-               Calculate differences
-               ---------------------------------------------------- */
-
             let years =
-                now.getFullYear()
-                -
+                now.getFullYear() -
                 startDate.getFullYear();
 
             let months =
-                now.getMonth()
-                -
+                now.getMonth() -
                 startDate.getMonth();
 
             let days =
-                now.getDate()
-                -
+                now.getDate() -
                 startDate.getDate();
 
             let hours =
-                now.getHours()
-                -
+                now.getHours() -
                 startDate.getHours();
 
             let minutes =
-                now.getMinutes()
-                -
+                now.getMinutes() -
                 startDate.getMinutes();
 
             let seconds =
-                now.getSeconds()
-                -
+                now.getSeconds() -
                 startDate.getSeconds();
 
-            /* ----------------------------------------------------
-               Borrow seconds
-               ---------------------------------------------------- */
+
+            /* Borrow seconds */
 
             if (seconds < 0) {
-
                 seconds += 60;
                 minutes--;
             }
 
-            /* ----------------------------------------------------
-               Borrow minutes
-               ---------------------------------------------------- */
+
+            /* Borrow minutes */
 
             if (minutes < 0) {
-
                 minutes += 60;
                 hours--;
             }
 
-            /* ----------------------------------------------------
-               Borrow hours
-               ---------------------------------------------------- */
+
+            /* Borrow hours */
 
             if (hours < 0) {
-
                 hours += 24;
                 days--;
             }
 
-            /* ----------------------------------------------------
-               Borrow days
-               ---------------------------------------------------- */
+
+            /* Borrow days */
 
             if (days < 0) {
 
-                /*
-                 * Get the number of days in the previous month.
-                 */
-                let previousMonthDate =
+                const previousMonthDate =
                     new Date(
                         now.getFullYear(),
                         now.getMonth(),
@@ -665,18 +594,17 @@
                 months--;
             }
 
-            /* ----------------------------------------------------
-               Borrow months
-               ---------------------------------------------------- */
+
+            /* Borrow months */
 
             if (months < 0) {
-
                 months += 12;
                 years--;
             }
 
+
             /* ====================================================
-               UPDATE HTML
+               UPDATE
                ==================================================== */
 
             document.getElementById(
@@ -690,10 +618,6 @@
             document.getElementById(
                 'val-days'
             ).innerText = days;
-
-            /* ----------------------------------------------------
-               Add leading zeros
-               ---------------------------------------------------- */
 
             document.getElementById(
                 'val-hours'
@@ -716,10 +640,6 @@
                     .toString()
                     .padStart(2, '0');
         }
-
-        /* ========================================================
-           START TIMER
-           ======================================================== */
 
         calculateRelationshipTime();
 
