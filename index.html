@@ -393,15 +393,29 @@
                 `bold ${fontSize}px Kanit, sans-serif`;
 
             /*
-             * ทำ glow แค่ครั้งเดียว
+             * เพิ่ม glow ให้ฟุ้งและนุ่มขึ้น
+             * วาด 2 ชั้น: glow ใหญ่ + glow ใกล้ตัวอักษร
              */
-            spriteCtx.shadowBlur = 10;
+            spriteCtx.shadowBlur = 28;
 
             spriteCtx.shadowColor =
-                "rgba(255, 60, 160, 0.72)";
+                "rgba(255, 70, 170, 0.95)";
 
             spriteCtx.fillStyle =
-                "#ff9dcc";
+                "rgba(255, 125, 195, 0.95)";
+
+            spriteCtx.fillText(
+                "เค้ารักคูมนะ",
+                spriteCanvas.width / 2,
+                spriteCanvas.height / 2
+            );
+
+            spriteCtx.shadowBlur = 12;
+            spriteCtx.shadowColor =
+                "rgba(255, 170, 220, 0.95)";
+
+            spriteCtx.fillStyle =
+                "#ffb6dc";
 
             spriteCtx.fillText(
                 "เค้ารักคูมนะ",
@@ -410,12 +424,12 @@
             );
 
             /*
-             * เพิ่มชั้นข้อความสีขาวบาง ๆ
+             * เพิ่มชั้นข้อความสีขาวบาง ๆ เป็นแกนกลาง
              */
             spriteCtx.shadowBlur = 0;
 
             spriteCtx.fillStyle =
-                "rgba(255,255,255,0.65)";
+                "rgba(255,255,255,0.72)";
 
             spriteCtx.fillText(
                 "เค้ารักคูมนะ",
