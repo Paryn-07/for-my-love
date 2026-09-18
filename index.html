@@ -448,74 +448,110 @@
             points = [];
 
             /*
-             * 420 จุด
+             * เปลี่ยนมาใช้สมการพาราเมตริกของหัวใจ (parametric heart curve)
+             * แทนสมการ implicit เดิม
              *
-             * จำนวนนี้ยังเห็นรูปหัวใจง่าย
-             * แต่ไม่หนักเท่า 900 จุด
+             * เหตุผล: สมการเดิมใช้ rejection sampling บนก้อนลูกบาศก์
+             * ทำให้จุดกระจายแบบสุ่มไม่สม่ำเสมอ บางมุมมองดูเป็นก้อนกลม ๆ
+             * ไม่ชัดว่าเป็นรูปหัวใจ โดยเฉพาะบนจอมือถือที่เล็กและอยู่ไกลตา
+             *
+             * สมการพาราเมตริกนี้วาดเส้นขอบหัวใจได้แม่นตรง 100% ทุกจุด
+             * แล้วเติม "เนื้อใน" แบบมีความหนา (พองตรงกลาง บางตรงขอบ)
+             * เหมือนหมอนรูปหัวใจ ทำให้หมุนไปมุมไหนก็ยังดูออกว่าเป็นหัวใจ
+             * ไม่ใช่แผ่นแบนที่หมุนแล้วบางจนหายไปเป็นเส้น
+             *
+             * จำนวนจุดยังคงเท่าเดิม (500) เพื่อไม่ให้หนักขึ้น/แลค
              */
+
             const numPoints = 500;
 
-            /*
-             * สุ่มบน 3D heart surface
-             */
-            let attempts = 0;
+            const scaleX = 16.5;
+            const scaleY = 18;
 
-            while (
-                points.length < numPoints &&
-                attempts < 200000
+            /*
+             * ความหนาสูงสุดตรงกลางหัวใจ
+             */
+            const maxThickness = 0.5;
+
+            for (
+                let i = 0;
+                i < numPoints;
+                i++
             ) {
 
-                attempts++;
+                const t =
+                    Math.random() * Math.PI * 2;
 
-                const x =
-                    (Math.random() - 0.5) * 3.5;
+                const bx =
+                    16 * Math.pow(
+                        Math.sin(t),
+                        3
+                    );
 
-                const y =
-                    (Math.random() - 0.5) * 3.5;
+                const by =
+                    13 * Math.cos(t) -
+                    5 * Math.cos(2 * t) -
+                    2 * Math.cos(3 * t) -
+                    Math.cos(4 * t);
 
-                const z =
-                    (Math.random() - 0.5) * 3.5;
+                let s;
 
+                if (i < numPoints * 0.35) {
 
-                /*
-                 * 3D Heart Equation
-                 */
-                const a =
-                    x * x +
-                    2.25 * y * y +
-                    z * z -
-                    1;
+                    /*
+                     * 35% ของจุดแรก
+                     * เกาะอยู่แถบขอบนอกของหัวใจ
+                     * เพื่อวาดเส้น outline ให้ชัดเจน
+                     * (จุดหยักบนสุด + ปลายแหลมล่าง จะเห็นง่าย)
+                     */
+                    s =
+                        0.80 +
+                        Math.random() * 0.20;
 
+                } else {
 
-                const value =
-                    a * a * a -
-                    x * x * z * z * z -
-                    0.1125 *
-                    y * y *
-                    z * z * z;
-
-
-                /*
-                 * Shell thickness
-                 *
-                 * เพิ่มจากเดิมนิดหน่อยเพื่อให้
-                 * silhouette ของหัวใจเต็มขึ้น
-                 */
-                if (
-                    value <= 0 &&
-                    value > -0.30
-                ) {
-
-                    points.push({
-
-                        origX: x,
-
-                        origY: -z,
-
-                        origZ: y
-
-                    });
+                    /*
+                     * ที่เหลือกระจายเต็มพื้นที่ด้านใน
+                     * ใช้ sqrt(random) เพื่อให้ความหนาแน่น
+                     * ต่อหน่วยพื้นที่สม่ำเสมอ ไม่กระจุกตรงกลาง
+                     */
+                    s = Math.sqrt(
+                        Math.random()
+                    );
                 }
+
+                const nx =
+                    (s * bx) / scaleX;
+
+                const ny =
+                    -(s * by) / scaleY;
+
+                /*
+                 * หน้าตัดแบบเลนส์: หนาสุดตรงกลาง
+                 * บางลงเรื่อย ๆ จนเป็น 0 ที่ขอบเส้น outline
+                 */
+                const thickness =
+                    maxThickness *
+                    Math.sqrt(
+                        Math.max(
+                            0,
+                            1 - s * s
+                        )
+                    );
+
+                const nz =
+                    (Math.random() * 2 - 1) *
+                    thickness;
+
+                points.push({
+
+                    origX: nx,
+
+                    origY: ny,
+
+                    origZ: nz
+
+                });
             }
         }
 
