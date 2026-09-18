@@ -65,7 +65,7 @@
             align-items: center;
             justify-content: flex-end;
 
-            padding-bottom: 5vh;
+            padding-bottom: 4vh;
 
             pointer-events: none;
         }
@@ -121,7 +121,7 @@
         }
 
         .time-value {
-            font-size: clamp(0.95rem, 6vw, 1.75rem);
+            font-size: clamp(1rem, 5.8vw, 1.75rem);
             font-weight: 800;
 
             color: var(--text-color);
@@ -166,6 +166,42 @@
         /* ========================================================
            RESPONSIVE
            ======================================================== */
+
+        /* Mobile: use more of the available screen */
+        @media (max-width: 639px) {
+            #ui-layer {
+                padding-bottom: 3vh;
+            }
+
+            .glass-panel {
+                width: 96%;
+                max-width: 430px;
+                padding: 16px 9px 14px;
+                border-radius: 20px;
+            }
+
+            .glass-panel > .flex {
+                gap: 3px;
+            }
+
+            .time-block {
+                padding: 10px 2px;
+                border-radius: 12px;
+            }
+
+            .time-value {
+                font-size: clamp(1.05rem, 5.8vw, 1.35rem);
+            }
+
+            .time-label {
+                font-size: clamp(0.58rem, 2.45vw, 0.72rem);
+            }
+
+            .glass-panel p {
+                margin-top: 14px;
+                font-size: 0.65rem;
+            }
+        }
 
         @media (min-width: 640px) {
 
@@ -359,10 +395,10 @@
             /*
              * ทำ glow แค่ครั้งเดียว
              */
-            spriteCtx.shadowBlur = 7;
+            spriteCtx.shadowBlur = 10;
 
             spriteCtx.shadowColor =
-                "rgba(255, 60, 160, 0.85)";
+                "rgba(255, 60, 160, 0.72)";
 
             spriteCtx.fillStyle =
                 "#ff9dcc";
@@ -660,11 +696,18 @@
              * ใหญ่พอเห็นเป็นหัวใจ
              * แต่ยังไม่ชนขอบ
              */
+            let heartScale = 0.36;
+
+            if (window.innerWidth < 640) {
+                /* มือถือ: ขยายหัวใจให้ใช้พื้นที่กว้างขึ้น */
+                heartScale = 0.44;
+            }
+
             const baseSize =
                 Math.min(
                     window.innerWidth,
                     window.innerHeight
-                ) * 0.36;
+                ) * heartScale;
 
 
             /* ====================================================
