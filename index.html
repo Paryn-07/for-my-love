@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เค้ารักคูมนะ - Our Timeline</title>
+    
+    <!-- Load Tailwind CSS for responsive layouts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts for beautiful Thai typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-glow: #ff66b2;
+            --secondary-glow: #ff1a8c;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #000000; /* Pure black background */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling, fits to screen */
+            touch-action: none;
+        }
+
+        /* Canvas for 3D graphics */
+        #heartCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none; /* Let clicks pass through if needed */
+        }
+
+        /* Overlay UI Container */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 5vh;
+            pointer-events: none; /* Only children are interactive */
+        }
+
+        /* Glassmorphism Timer Container */
+        .glass-panel {
+            background: rgba(255, 10, 110, 0.05);
+            border: 1px solid rgba(255, 102, 178, 0.2);
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.15), inset 0 0 10px rgba(255, 102, 178, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 24px;
+            pointer-events: auto;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Individual Time Blocks */
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 102, 178, 0.3);
+            border-radius: 16px;
+            min-width: 70px;
+            padding: 10px 5px;
+            box-shadow: inset 0 0 10px rgba(255, 102, 178, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .time-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.4);
+        }
+
+        .time-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-color);
+            line-height: 1.2;
+            text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--secondary-glow);
+        }
+
+        .time-label {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #ffb3d9;
+            text-shadow: 0 0 5px rgba(255, 102, 178, 0.5);
+            margin-top: 2px;
+        }
+
+        /* Text Effects */
+        .glowing-text {
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow), 0 0 40px var(--secondary-glow);
+            letter-spacing: 1px;
+        }
+
+        /* Floating animation for the UI panel */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Responsive Adjustments for Mobile / iPad */
+        @media (min-width: 640px) {
+            .time-block {
+                min-width: 90px;
+                padding: 15px 10px;
+            }
+            .time-value { font-size: 2.5rem; }
+            .time-label { font-size: 1rem; }
+        }
+        
+        @media (min-width: 768px) { /* iPad */
+            #ui-layer { padding-bottom: 8vh; }
+            .time-block { min-width: 100px; }
+            .time-value { font-size: 3rem; }
+            .time-label { font-size: 1.1rem; }
+            .glass-panel { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Heart Canvas -->
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- UI Overlay for Text and Timer -->
+    <div id="ui-layer" class="w-full h-full flex flex-col items-center">
+        
+        <!-- Timer Container -->
+        <div class="glass-panel w-[95%] sm:w-auto max-w-4xl mx-auto px-4 py-6 sm:px-8 sm:py-8 flex flex-col items-center">
+            
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 w-full">
+                <!-- Years -->
+                <div class="time-block">
+                    <span id="val-years" class="time-value">0</span>
+                    <span class="time-label">ปี</span>
+                </div>
+                <!-- Months -->
+                <div class="time-block">
+                    <span id="val-months" class="time-value">0</span>
+                    <span class="time-label">เดือน</span>
+                </div>
+                <!-- Days -->
+                <div class="time-block">
+                    <span id="val-days" class="time-value">0</span>
+                    <span class="time-label">วัน</span>
+                </div>
+                <!-- Hours -->
+                <div class="time-block">
+                    <span id="val-hours" class="time-value">0</span>
+                    <span class="time-label">ชั่วโมง</span>
+                </div>
+                <!-- Minutes -->
+                <div class="time-block">
+                    <span id="val-mins" class="time-value">0</span>
+                    <span class="time-label">นาที</span>
+                </div>
+                <!-- Seconds -->
+                <div class="time-block">
+                    <span id="val-secs" class="time-value">0</span>
+                    <span class="time-label">วินาที</span>
+                </div>
+            </div>
+            
+            <p class="mt-6 text-xs sm:text-sm text-pink-200 opacity-70 tracking-widest">
+                SINCE 19 APRIL 2022
+            </p>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================================
+           3D HEART CANVAS LOGIC
+           ======================================================== */
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let angleY = 0;
+        let angleX = 0.2; // Slight downward tilt
+
+        // Function to handle High DPI (Retina) displays correctly
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Generate points for the 3D heart using Rejection Sampling
+        // Math surface: (x^2 + 2.25y^2 + z^2 - 1)^3 - x^2*z^3 - 0.1125y^2*z^3 = 0
+        function generateHeartCloud() {
+            points = [];
+            const textToRender = "เค้ารักคูมนะ";
+            const numPoints = 500; // Optimal for readability and performance
+            
+            let attempts = 0;
+            while(points.length < numPoints && attempts < 100000) {
+                attempts++;
+                // Random coordinates in space bounded by [-1.5, 1.5]
+                let x = (Math.random() - 0.5) * 3.5;
+                let y = (Math.random() - 0.5) * 3.5;
+                let z = (Math.random() - 0.5) * 3.5;
+                
+                // 3D Heart Equation
+                let a = x*x + 2.25*y*y + z*z - 1;
+                let val = a*a*a - (x*x * z*z*z) - (0.1125 * y*y * z*z*z);
+                
+                // Keep points that are on or slightly inside the surface to create a hollow 3D shell
+                if (val <= 0.0 && val > -0.2) {
+                    // Map math coordinates to canvas space orientation
+                    // Standard equation has pointy bit at bottom (Z negative)
+                    // Canvas Y goes down. So we map Z to -Y.
+                    points.push({
+                        origX: x, 
+                        origY: -z, // Z becomes Canvas Y
+                        origZ: y,  // Y becomes Canvas depth
+                        text: textToRender
+                    });
+                }
+            }
+        }
+
+        function animateHeart() {
+            requestAnimationFrame(animateHeart);
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            
+            angleY += 0.006; // Rotation speed
+            
+            // Screen dimensions for centering
+            let cx = window.innerWidth / 2;
+            // Move center up slightly to accommodate the timer UI at the bottom
+            let cy = (window.innerHeight / 2) - (window.innerHeight * 0.15); 
+            
+            // Calculate scale based on screen size to keep responsive
+            let baseSize = Math.min(window.innerWidth, window.innerHeight) * 0.45;
+            
+            // Apply 3D Rotation Transformations
+            let projected = points.map(p => {
+                // Rotate around X-axis
+                let y1 = p.origY * Math.cos(angleX) - p.origZ * Math.sin(angleX);
+                let z1 = p.origY * Math.sin(angleX) + p.origZ * Math.cos(angleX);
+                
+                // Rotate around Y-axis
+                let x2 = p.origX * Math.cos(angleY) - z1 * Math.sin(angleY);
+                let z2 = p.origX * Math.sin(angleY) + z1 * Math.cos(angleY);
+                let y2 = y1;
+                
+                return { x: x2, y: y2, z: z2, text: p.text };
+            });
+            
+            // Painter's Algorithm: Sort from farthest (negative Z) to nearest (positive Z)
+            projected.sort((a, b) => a.z - b.z);
+            
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Render each text particle
+            projected.forEach(p => {
+                // Perspective projection mapping
+                let fov = 3.0; // Field of view equivalent
+                let perspectiveScale = fov / (fov + p.z);
+                
+                // If it's too far behind the camera, don't render
+                if (perspectiveScale < 0) return; 
+                
+                let screenX = cx + p.x * baseSize * perspectiveScale;
+                let screenY = cy + p.y * baseSize * perspectiveScale;
+                
+                // Base font size scaling with perspective and screen size
+                let responsiveFontSize = (window.innerWidth < 768) ? 10 : 14;
+                let fontSize = responsiveFontSize * perspectiveScale;
+                
+                ctx.font = `bold ${fontSize}px 'Kanit', sans-serif`;
+                
+                // Depth-based fading (far objects are dimmer)
+                // Normalize Z roughly between -1.5 (far) to 1.5 (near)
+                let alpha = Math.max(0.15, Math.min(1, (p.z + 2) / 3));
+                
+                // Draw text with glow
+                ctx.shadowBlur = 10 * perspectiveScale;
+                ctx.shadowColor = `rgba(255, 102, 178, ${alpha})`;
+                
+                // Brighter pink for foreground text, deeper for background
+                let brightness = Math.floor(150 + (alpha * 105));
+                ctx.fillStyle = `rgba(255, ${255 - brightness + 100}, ${brightness}, ${alpha})`;
+                
+                ctx.fillText(p.text, screenX, screenY);
+            });
+        }
+
+        // Initialize 3D Engine
+        generateHeartCloud();
+        animateHeart();
+
+        /* ========================================================
+           RELATIONSHIP TIMER LOGIC
+           ======================================================== */
+        function calculateRelationshipTime() {
+            // Start Date: April 19, 2022, 00:00:00 
+            // Note: JS Date month is 0-indexed (0=Jan, 3=Apr)
+            const startDate = new Date(2022, 3, 19, 0, 0, 0);
+            const now = new Date();
+            
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+            let hours = now.getHours() - startDate.getHours();
+            let minutes = now.getMinutes() - startDate.getMinutes();
+            let seconds = now.getSeconds() - startDate.getSeconds();
+
+            // Perform borrowing from larger units when values are negative
+            if (seconds < 0) {
+                seconds += 60;
+                minutes--;
+            }
+            if (minutes < 0) {
+                minutes += 60;
+                hours--;
+            }
+            if (hours < 0) {
+                hours += 24;
+                days--;
+            }
+            if (days < 0) {
+                // Get the total number of days in the previous month relative to "now"
+                let previousMonthDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += previousMonthDate.getDate();
+                months--;
+            }
+            if (months < 0) {
+                months += 12;
+                years--;
+            }
+
+            // Update DOM Elements
+            document.getElementById('val-years').innerText = years;
+            document.getElementById('val-months').innerText = months;
+            document.getElementById('val-days').innerText = days;
+            
+            // Add leading zeros for time components
+            document.getElementById('val-hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('val-mins').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('val-secs').innerText = seconds.toString().padStart(2, '0');
+        }
+
+        // Run timer immediately, then update every 1 second
+        calculateRelationshipTime();
+        setInterval(calculateRelationshipTime, 1000);
+
+    </script>
+</body>
+</html>
