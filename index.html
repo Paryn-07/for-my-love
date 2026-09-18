@@ -1,9 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Our Timeline</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,50 +23,69 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #000000;
+            width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #000000;
             touch-action: none;
         }
 
+        /* ========================================================
+           HEART CANVAS
+           ======================================================== */
+
         #heartCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: fixed;
+            inset: 0;
             width: 100%;
             height: 100%;
             z-index: 1;
             pointer-events: none;
         }
 
+        /* ========================================================
+           UI
+           ======================================================== */
+
         #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed;
+            inset: 0;
             z-index: 10;
+
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
             align-items: center;
+            justify-content: flex-end;
+
             padding-bottom: 5vh;
+
             pointer-events: none;
         }
 
         .glass-panel {
             background: rgba(255, 10, 110, 0.05);
-            border: 1px solid rgba(255, 102, 178, 0.2);
+
+            border: 1px solid rgba(255, 102, 178, 0.20);
+
             box-shadow:
                 0 0 20px rgba(255, 102, 178, 0.15),
-                inset 0 0 10px rgba(255, 102, 178, 0.1);
+                inset 0 0 10px rgba(255, 102, 178, 0.10);
+
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
+
             border-radius: 24px;
+
             pointer-events: auto;
+
             animation: float 6s ease-in-out infinite;
         }
 
@@ -75,25 +94,39 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 102, 178, 0.3);
+
+            background: rgba(0, 0, 0, 0.40);
+
+            border: 1px solid rgba(255, 102, 178, 0.30);
+
             border-radius: 16px;
+
             min-width: 70px;
             padding: 10px 5px;
-            box-shadow: inset 0 0 10px rgba(255, 102, 178, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            box-shadow:
+                inset 0 0 10px rgba(255, 102, 178, 0.10);
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease;
         }
 
         .time-block:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.4);
+
+            box-shadow:
+                0 5px 15px rgba(255, 102, 178, 0.40);
         }
 
         .time-value {
             font-size: 1.75rem;
             font-weight: 800;
+
             color: var(--text-color);
+
             line-height: 1.2;
+
             text-shadow:
                 0 0 10px var(--primary-glow),
                 0 0 20px var(--secondary-glow);
@@ -102,14 +135,18 @@
         .time-label {
             font-size: 0.8rem;
             font-weight: 400;
+
             color: #ffb3d9;
-            text-shadow: 0 0 5px rgba(255, 102, 178, 0.5);
+
+            text-shadow:
+                0 0 5px rgba(255, 102, 178, 0.50);
+
             margin-top: 2px;
         }
 
         @keyframes float {
             0% {
-                transform: translateY(0px);
+                transform: translateY(0);
             }
 
             50% {
@@ -117,11 +154,16 @@
             }
 
             100% {
-                transform: translateY(0px);
+                transform: translateY(0);
             }
         }
 
+        /* ========================================================
+           RESPONSIVE
+           ======================================================== */
+
         @media (min-width: 640px) {
+
             .time-block {
                 min-width: 90px;
                 padding: 15px 10px;
@@ -137,6 +179,7 @@
         }
 
         @media (min-width: 768px) {
+
             #ui-layer {
                 padding-bottom: 8vh;
             }
@@ -162,7 +205,16 @@
 
 <body>
 
+    <!-- ========================================================
+         HEART
+         ======================================================== -->
+
     <canvas id="heartCanvas"></canvas>
+
+
+    <!-- ========================================================
+         TIMER UI
+         ======================================================== -->
 
     <div id="ui-layer" class="w-full h-full flex flex-col items-center">
 
@@ -170,31 +222,37 @@
 
             <div class="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 w-full">
 
+                <!-- Years -->
                 <div class="time-block">
                     <span id="val-years" class="time-value">0</span>
                     <span class="time-label">ปี</span>
                 </div>
 
+                <!-- Months -->
                 <div class="time-block">
                     <span id="val-months" class="time-value">0</span>
                     <span class="time-label">เดือน</span>
                 </div>
 
+                <!-- Days -->
                 <div class="time-block">
                     <span id="val-days" class="time-value">0</span>
                     <span class="time-label">วัน</span>
                 </div>
 
+                <!-- Hours -->
                 <div class="time-block">
                     <span id="val-hours" class="time-value">0</span>
                     <span class="time-label">ชั่วโมง</span>
                 </div>
 
+                <!-- Minutes -->
                 <div class="time-block">
                     <span id="val-mins" class="time-value">0</span>
                     <span class="time-label">นาที</span>
                 </div>
 
+                <!-- Seconds -->
                 <div class="time-block">
                     <span id="val-secs" class="time-value">0</span>
                     <span class="time-label">วินาที</span>
@@ -207,116 +265,292 @@
             </p>
 
         </div>
+
     </div>
 
+
     <script>
+
         /* ========================================================
-           3D HEART
+           3D HEART ENGINE
            ======================================================== */
 
-        const canvas = document.getElementById('heartCanvas');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d", {
+            alpha: true
+        });
+
+
+        /* ========================================================
+           VARIABLES
+           ======================================================== */
 
         let points = [];
 
-        // หมุนแนวตั้งน้อยลง เพื่อให้เห็นทรงหัวใจชัด
-        let angleX = 0.08;
         let angleY = 0;
 
+        /*
+         * เอียงน้อยมาก
+         * เพื่อรักษาทรงหัวใจให้เห็นชัด
+         */
+        let angleX = 0.04;
+
+        /*
+         * ใช้เวลาในการคำนวณ animation
+         */
         let lastTime = 0;
 
+        /*
+         * จำกัด DPR
+         *
+         * จอมือถือ/จอ Retina บางเครื่องมี DPR = 3 หรือ 4
+         * ซึ่งทำให้ canvas หนักโดยไม่จำเป็น
+         */
+        let dpr = Math.min(
+            window.devicePixelRatio || 1,
+            1.5
+        );
+
+
         /* ========================================================
-           RESIZE
+           TEXT SPRITE
+           ======================================================== */
+
+        /*
+         * แทนที่จะให้ Canvas วาดข้อความ 420 ครั้งทุกเฟรม
+         * เราสร้างข้อความเป็นภาพครั้งเดียว
+         * แล้วใช้ drawImage() ซ้ำ
+         */
+
+        const spriteCanvas =
+            document.createElement("canvas");
+
+        const spriteCtx =
+            spriteCanvas.getContext("2d");
+
+
+        function createTextSprite() {
+
+            const fontSize = 16;
+
+            const padding = 12;
+
+            spriteCanvas.width = 180;
+            spriteCanvas.height = 55;
+
+            spriteCtx.clearRect(
+                0,
+                0,
+                spriteCanvas.width,
+                spriteCanvas.height
+            );
+
+            spriteCtx.textAlign = "center";
+            spriteCtx.textBaseline = "middle";
+
+            spriteCtx.font =
+                `bold ${fontSize}px Kanit, sans-serif`;
+
+            /*
+             * ทำ glow แค่ครั้งเดียว
+             */
+            spriteCtx.shadowBlur = 7;
+
+            spriteCtx.shadowColor =
+                "rgba(255, 60, 160, 0.85)";
+
+            spriteCtx.fillStyle =
+                "#ff9dcc";
+
+            spriteCtx.fillText(
+                "เค้ารักคูมนะ",
+                spriteCanvas.width / 2,
+                spriteCanvas.height / 2
+            );
+
+            /*
+             * เพิ่มชั้นข้อความสีขาวบาง ๆ
+             */
+            spriteCtx.shadowBlur = 0;
+
+            spriteCtx.fillStyle =
+                "rgba(255,255,255,0.65)";
+
+            spriteCtx.fillText(
+                "เค้ารักคูมนะ",
+                spriteCanvas.width / 2,
+                spriteCanvas.height / 2
+            );
+        }
+
+
+        createTextSprite();
+
+
+        /* ========================================================
+           RESIZE CANVAS
            ======================================================== */
 
         function resize() {
-            const dpr = window.devicePixelRatio || 1;
 
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
+            dpr = Math.min(
+                window.devicePixelRatio || 1,
+                1.5
+            );
 
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
+            const width =
+                window.innerWidth;
 
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.scale(dpr, dpr);
+            const height =
+                window.innerHeight;
+
+            canvas.width =
+                Math.floor(width * dpr);
+
+            canvas.height =
+                Math.floor(height * dpr);
+
+            canvas.style.width =
+                width + "px";
+
+            canvas.style.height =
+                height + "px";
+
+            /*
+             * สำคัญ:
+             * reset transform ก่อน scale
+             */
+            ctx.setTransform(
+                dpr,
+                0,
+                0,
+                dpr,
+                0,
+                0
+            );
         }
 
-        window.addEventListener('resize', resize);
+
+        window.addEventListener(
+            "resize",
+            resize
+        );
+
         resize();
 
+
         /* ========================================================
-           GENERATE HEART
+           GENERATE HEART POINTS
            ======================================================== */
 
         function generateHeartCloud() {
 
             points = [];
 
-            const textToRender = "เค้ารักคูมนะ";
+            /*
+             * 420 จุด
+             *
+             * จำนวนนี้ยังเห็นรูปหัวใจง่าย
+             * แต่ไม่หนักเท่า 900 จุด
+             */
+            const numPoints = 420;
 
             /*
-             * เพิ่มจำนวนจุดจาก 500 เป็น 900
-             * เพื่อให้ทรงหัวใจเห็นชัดขึ้น
+             * สุ่มบน 3D heart surface
              */
-            const numPoints = 900;
-
             let attempts = 0;
 
             while (
                 points.length < numPoints &&
-                attempts < 150000
+                attempts < 200000
             ) {
+
                 attempts++;
 
-                let x = (Math.random() - 0.5) * 3.5;
-                let y = (Math.random() - 0.5) * 3.5;
-                let z = (Math.random() - 0.5) * 3.5;
+                const x =
+                    (Math.random() - 0.5) * 3.5;
+
+                const y =
+                    (Math.random() - 0.5) * 3.5;
+
+                const z =
+                    (Math.random() - 0.5) * 3.5;
+
 
                 /*
                  * 3D Heart Equation
                  */
-                let a =
+                const a =
                     x * x +
                     2.25 * y * y +
                     z * z -
                     1;
 
-                let val =
+
+                const value =
                     a * a * a -
-                    (x * x * z * z * z) -
-                    (0.1125 * y * y * z * z * z);
+                    x * x * z * z * z -
+                    0.1125 *
+                    y * y *
+                    z * z * z;
+
 
                 /*
-                 * ทำ shell ให้หนาขึ้นเล็กน้อย
-                 * จะมองออกว่าเป็นรูปหัวใจมากขึ้น
+                 * Shell thickness
+                 *
+                 * เพิ่มจากเดิมนิดหน่อยเพื่อให้
+                 * silhouette ของหัวใจเต็มขึ้น
                  */
-                if (val <= 0.0 && val > -0.28) {
+                if (
+                    value <= 0 &&
+                    value > -0.30
+                ) {
 
                     points.push({
+
                         origX: x,
+
                         origY: -z,
-                        origZ: y,
-                        text: textToRender
+
+                        origZ: y
+
                     });
                 }
             }
         }
 
+
+        generateHeartCloud();
+
+
         /* ========================================================
-           ANIMATION
+           ANIMATE HEART
            ======================================================== */
 
-        function animateHeart(currentTime = 0) {
+        function animateHeart(time = 0) {
 
-            requestAnimationFrame(animateHeart);
-
-            const deltaTime = Math.min(
-                (currentTime - lastTime) / 1000,
-                0.05
+            requestAnimationFrame(
+                animateHeart
             );
 
-            lastTime = currentTime;
+
+            /*
+             * Delta time
+             *
+             * ทำให้ animation ไม่ขึ้นกับ FPS
+             */
+            const deltaTime =
+                Math.min(
+                    (time - lastTime) / 1000,
+                    0.05
+                );
+
+            lastTime = time;
+
+
+            /* ====================================================
+               CLEAR
+               ==================================================== */
 
             ctx.clearRect(
                 0,
@@ -325,188 +559,253 @@
                 window.innerHeight
             );
 
+
+            /* ====================================================
+               ROTATION
+               ==================================================== */
+
             /*
-             * หมุนช้าลงกว่าเดิม
-             * ทำให้ดู smooth และนุ่มกว่า
+             * หมุนช้าลง
+             *
+             * 0.22 rad/sec
              */
-            angleY += 0.32 * deltaTime;
+            angleY +=
+                0.22 * deltaTime;
+
+
+            /*
+             * คำนวณ sin/cos ครั้งเดียว
+             * ไม่ใช่ทุกจุด
+             */
+
+            const cosX =
+                Math.cos(angleX);
+
+            const sinX =
+                Math.sin(angleX);
+
+            const cosY =
+                Math.cos(angleY);
+
+            const sinY =
+                Math.sin(angleY);
+
 
             /* ====================================================
                POSITION
                ==================================================== */
 
-            const cx = window.innerWidth / 2;
+            const cx =
+                window.innerWidth / 2;
+
 
             /*
-             * วางหัวใจประมาณ 34% จากด้านบน
-             * เพื่อให้ timer ด้านล่างยังมีพื้นที่
+             * ตำแหน่งหัวใจ
+             *
+             * 34%
+             * อยู่ช่วงบนพอดี
              */
-            const cy = window.innerHeight * 0.34;
+            const cy =
+                window.innerHeight * 0.34;
+
 
             /* ====================================================
                SIZE
                ==================================================== */
 
             /*
-             * ใหญ่ขึ้นจากเวอร์ชันก่อน
-             * แต่ยังไม่ใหญ่เท่าเวอร์ชันแรก
+             * 0.36
+             *
+             * ใหญ่พอเห็นเป็นหัวใจ
+             * แต่ยังไม่ชนขอบ
              */
             const baseSize =
                 Math.min(
                     window.innerWidth,
                     window.innerHeight
-                ) * 0.34;
+                ) * 0.36;
+
 
             /* ====================================================
-               3D PROJECTION
+               PROJECT POINTS
                ==================================================== */
 
-            let projected = points.map(p => {
+            const projected =
+                new Array(points.length);
 
-                /* Rotate X */
 
-                const cosX = Math.cos(angleX);
-                const sinX = Math.sin(angleX);
+            for (
+                let i = 0;
+                i < points.length;
+                i++
+            ) {
 
-                let y1 =
+                const p =
+                    points[i];
+
+
+                /* -----------------------------------------------
+                   ROTATE X
+                   ----------------------------------------------- */
+
+                const y1 =
                     p.origY * cosX -
                     p.origZ * sinX;
 
-                let z1 =
+
+                const z1 =
                     p.origY * sinX +
                     p.origZ * cosX;
 
-                /* Rotate Y */
 
-                const cosY = Math.cos(angleY);
-                const sinY = Math.sin(angleY);
+                /* -----------------------------------------------
+                   ROTATE Y
+                   ----------------------------------------------- */
 
-                let x2 =
+                const x2 =
                     p.origX * cosY -
                     z1 * sinY;
 
-                let z2 =
+
+                const z2 =
                     p.origX * sinY +
                     z1 * cosY;
 
-                return {
+
+                projected[i] = {
+
                     x: x2,
+
                     y: y1,
-                    z: z2,
-                    text: p.text
+
+                    z: z2
                 };
-            });
+            }
+
 
             /* ====================================================
-               SORT DEPTH
+               DEPTH SORT
                ==================================================== */
 
-            projected.sort((a, b) => a.z - b.z);
+            projected.sort(
+                (a, b) => a.z - b.z
+            );
 
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
 
             /* ====================================================
-               DRAW HEART
+               DRAW
                ==================================================== */
 
-            projected.forEach(p => {
+            for (
+                let i = 0;
+                i < projected.length;
+                i++
+            ) {
 
-                const fov = 3.0;
+                const p =
+                    projected[i];
 
-                const perspectiveScale =
-                    fov /
-                    (fov + p.z);
 
-                if (perspectiveScale < 0) {
-                    return;
+                /* -----------------------------------------------
+                   Perspective
+                   ----------------------------------------------- */
+
+                const perspective =
+                    3.0 /
+                    (3.0 + p.z);
+
+
+                if (
+                    perspective <= 0
+                ) {
+                    continue;
                 }
+
+
+                /* -----------------------------------------------
+                   SCREEN POSITION
+                   ----------------------------------------------- */
 
                 const screenX =
                     cx +
                     p.x *
                     baseSize *
-                    perspectiveScale;
+                    perspective;
+
 
                 const screenY =
                     cy +
                     p.y *
                     baseSize *
-                    perspectiveScale;
+                    perspective;
+
+
+                /* -----------------------------------------------
+                   SIZE
+                   ----------------------------------------------- */
 
                 /*
-                 * ขนาดตัวอักษร
+                 * ภาพข้อความเดิมขนาด 180 x 55
+                 *
+                 * scale เล็กลง
+                 * เพื่อให้เกิดเป็น particle
                  */
-                const responsiveFontSize =
-                    window.innerWidth < 768
-                        ? 10
-                        : 14;
 
-                const fontSize =
-                    responsiveFontSize *
-                    perspectiveScale;
+                const size =
+                    0.40 *
+                    perspective;
 
-                ctx.font =
-                    `bold ${fontSize}px 'Kanit', sans-serif`;
 
-                /*
-                 * Depth
-                 */
+                const drawWidth =
+                    180 * size;
+
+
+                const drawHeight =
+                    55 * size;
+
+
+                /* -----------------------------------------------
+                   DEPTH OPACITY
+                   ----------------------------------------------- */
+
                 const alpha =
                     Math.max(
                         0.18,
                         Math.min(
-                            1,
-                            (p.z + 2) / 3
+                            0.95,
+                            0.45 +
+                            (p.z + 1.5) * 0.22
                         )
                     );
 
-                /*
-                 * Glow
-                 */
-                ctx.shadowBlur =
-                    9 *
-                    perspectiveScale;
 
-                ctx.shadowColor =
-                    `rgba(255, 102, 178, ${alpha})`;
+                ctx.globalAlpha =
+                    alpha;
+
 
                 /*
-                 * Pink brightness
+                 * drawImage เร็วกว่า
+                 * fillText + shadowBlur มาก
                  */
-                const brightness =
-                    Math.floor(
-                        155 +
-                        alpha * 100
-                    );
-
-                const green =
-                    Math.max(
-                        120,
-                        255 - brightness + 100
-                    );
-
-                ctx.fillStyle =
-                    `rgba(
-                        255,
-                        ${green},
-                        ${brightness},
-                        ${alpha}
-                    )`;
-
-                ctx.fillText(
-                    p.text,
-                    screenX,
-                    screenY
+                ctx.drawImage(
+                    spriteCanvas,
+                    screenX -
+                        drawWidth / 2,
+                    screenY -
+                        drawHeight / 2,
+                    drawWidth,
+                    drawHeight
                 );
-            });
+            }
+
+
+            /*
+             * reset alpha
+             */
+            ctx.globalAlpha = 1;
         }
 
-        /* ========================================================
-           START HEART
-           ======================================================== */
 
-        generateHeartCloud();
         animateHeart();
 
 
@@ -516,6 +815,9 @@
 
         function calculateRelationshipTime() {
 
+            /*
+             * 19 April 2022
+             */
             const startDate =
                 new Date(
                     2022,
@@ -526,58 +828,68 @@
                     0
                 );
 
-            const now = new Date();
+
+            const now =
+                new Date();
+
 
             let years =
                 now.getFullYear() -
                 startDate.getFullYear();
 
+
             let months =
                 now.getMonth() -
                 startDate.getMonth();
+
 
             let days =
                 now.getDate() -
                 startDate.getDate();
 
+
             let hours =
                 now.getHours() -
                 startDate.getHours();
 
+
             let minutes =
                 now.getMinutes() -
                 startDate.getMinutes();
+
 
             let seconds =
                 now.getSeconds() -
                 startDate.getSeconds();
 
 
-            /* Borrow seconds */
+            /* ====================================================
+               BORROW
+               ==================================================== */
 
             if (seconds < 0) {
+
                 seconds += 60;
+
                 minutes--;
             }
 
 
-            /* Borrow minutes */
-
             if (minutes < 0) {
+
                 minutes += 60;
+
                 hours--;
             }
 
 
-            /* Borrow hours */
-
             if (hours < 0) {
+
                 hours += 24;
+
                 days--;
             }
 
-
-            /* Borrow days */
 
             if (days < 0) {
 
@@ -588,60 +900,72 @@
                         0
                     );
 
+
                 days +=
                     previousMonthDate.getDate();
+
 
                 months--;
             }
 
 
-            /* Borrow months */
-
             if (months < 0) {
+
                 months += 12;
+
                 years--;
             }
 
 
             /* ====================================================
-               UPDATE
+               UPDATE UI
                ==================================================== */
 
             document.getElementById(
-                'val-years'
-            ).innerText = years;
+                "val-years"
+            ).innerText =
+                years;
+
 
             document.getElementById(
-                'val-months'
-            ).innerText = months;
+                "val-months"
+            ).innerText =
+                months;
+
 
             document.getElementById(
-                'val-days'
-            ).innerText = days;
+                "val-days"
+            ).innerText =
+                days;
+
 
             document.getElementById(
-                'val-hours'
+                "val-hours"
             ).innerText =
                 hours
                     .toString()
-                    .padStart(2, '0');
+                    .padStart(2, "0");
+
 
             document.getElementById(
-                'val-mins'
+                "val-mins"
             ).innerText =
                 minutes
                     .toString()
-                    .padStart(2, '0');
+                    .padStart(2, "0");
+
 
             document.getElementById(
-                'val-secs'
+                "val-secs"
             ).innerText =
                 seconds
                     .toString()
-                    .padStart(2, '0');
+                    .padStart(2, "0");
         }
 
+
         calculateRelationshipTime();
+
 
         setInterval(
             calculateRelationshipTime,
@@ -652,4 +976,3 @@
 
 </body>
 </html>
-```
